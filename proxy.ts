@@ -3,7 +3,7 @@ import { getAdminRouteRoles } from "@/lib/admin-routes";
 import { ROLE_LANDING_PAGE } from "@/lib/role-landing";
 import type { Session } from "@/types/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.BACKEND_URL;
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
