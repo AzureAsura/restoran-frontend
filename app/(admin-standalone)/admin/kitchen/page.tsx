@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import { kitchenQueueQueryOptions } from '@/lib/queries/kitchen';
-import { sessionQueryOptions } from '@/lib/queries/session';
+import { getForwardedSession } from '@/lib/server-session';
 import { ApiError } from '@/lib/api-client';
 import KitchenBoard from '@/components/admin/kitchen/KitchenBoard';
 import KitchenSkeleton from '@/components/admin/kitchen/KitchenSkeleton';
@@ -12,11 +12,13 @@ const KitchenPage = async () => {
   const queryClient = getQueryClient();
   const cookieHeader = (await cookies()).toString();
 
-  // Session di-prefetch juga di sini (beda dari (admin)/layout.tsx yang cuma
+  // Session di-seed juga di sini (beda dari (admin)/layout.tsx yang cuma
   // jalan buat grup (admin)) — grup (admin-standalone) gak lewat layout itu,
   // jadi tanpa ini header Admin/Logout bakal nunggu client-side fetch dulu
-  // buat tau role (persis temuan follow-up FASE 3 dulu).
-  await queryClient.prefetchQuery(sessionQueryOptions(cookieHeader));
+  // buat tau role (persis temuan follow-up FASE 3 dulu). Diambil dari header
+  // yang di-forward proxy.ts (middleware udah fetch session buat gate route
+  // ini), bukan fetch ulang.
+  queryClient.setQueryData(['session'], await getForwardedSession());
 
   // fetchQuery (bukan prefetchQuery) — endpoint ber-auth, lihat catatan sama
   // di app/(admin)/admin/tables/page.tsx.

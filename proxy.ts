@@ -37,7 +37,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(ROLE_LANDING_PAGE[session.user.role], request.url));
   }
 
-  return NextResponse.next();
+  // Session was already fetched above to gate this route — forward it to the
+  // server component tree via a request header so layout.tsx/page.tsx can
+  // seed the ['session'] query cache instead of calling get-session again.
+  // Server-side only: this header never reaches the browser, and `.set` on a
+  // fresh Headers copy overwrites anything a client tried to spoof.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-session-data', JSON.stringify(session));
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
