@@ -53,7 +53,7 @@ export const AdminLoginForm = () => {
           SISTEM MANAJEMEN INTERNAL RESERVASI, POINT OF SALE, DAN MONITORING DAPUR UTAMA. HARAP JAGA KERAHASIAAN KREDENSIAL AKSES ANDA.
         </p>
 
-        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
+        {/* <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
           Owner: owner@warungbagas.id / Owner#12345
         </p>
         <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
@@ -61,7 +61,7 @@ export const AdminLoginForm = () => {
         </p>
         <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
           Kitchen: kitchen@warungbagas.id / Kitchen#12345
-        </p>
+        </p> */}
 
       </div>
 
