@@ -37,7 +37,7 @@ export const AdminLoginForm = () => {
   return (
 
     <main className="w-full bg-canvas min-h-screen flex flex-col justify-center md:grid md:grid-cols-12 items-center section-pad pt-[12vw] pb-[12vw] md:pt-0 md:pb-0 gap-[10vw] md:gap-0">
-      
+
 
       <div className="w-full md:col-span-5 flex flex-col items-center text-center md:items-start md:text-left gap-[4vw] md:gap-[2vw] justify-center h-full border-b border-black/5 pb-[8vw] md:pb-0 md:border-b-0 md:border-r md:border-black/5 md:pr-[4vw]">
         <div className="flex flex-col gap-[1vw]">
@@ -48,10 +48,21 @@ export const AdminLoginForm = () => {
             Megatha
           </h1>
         </div>
-        
+
         <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
           SISTEM MANAJEMEN INTERNAL RESERVASI, POINT OF SALE, DAN MONITORING DAPUR UTAMA. HARAP JAGA KERAHASIAAN KREDENSIAL AKSES ANDA.
         </p>
+
+        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
+          Owner: owner@warungbagas.id / Owner#12345
+        </p>
+        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
+          Cashier: cashier@warungbagas.id / Cashier#12345
+        </p>
+        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
+          Kitchen: kitchen@warungbagas.id / Kitchen#12345
+        </p>
+
       </div>
 
 

@@ -10,7 +10,7 @@ export const Navbar = () => {
     { name: 'Home', href: '/' },
     { name: 'Menu', href: '/menu' },
     { name: 'Reservations', href: '/booking' },
-    { name: 'Terminal', href: '/admin/login' },
+    { name: 'Admin', href: '/admin/login' },
   ];
 
   return (
