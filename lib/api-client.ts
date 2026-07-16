@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Server (SSR/SSG) has no origin to resolve a relative path against, so it
+// must hit the backend directly; the browser goes through the same-origin
+// proxy (see next.config.ts rewrites) so the auth cookie is set first-party.
+const API_URL = typeof window === "undefined" ? process.env.BACKEND_URL : process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
   code: string;
