@@ -186,3 +186,22 @@
     transform: translate(4px, -4px);
   }
 }
+
+/* Struk cetak (Receipt.tsx) — print only the [data-receipt-print] subtree,
+ * hide the rest of the app. visibility (not display) so nested absolute
+ * positioning inside the receipt still lays out correctly. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  [data-receipt-print],
+  [data-receipt-print] * {
+    visibility: visible;
+  }
+  [data-receipt-print] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

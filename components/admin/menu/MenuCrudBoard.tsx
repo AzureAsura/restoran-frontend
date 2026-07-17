@@ -65,9 +65,6 @@ export default function MenuCrudBoard() {
   const isOwner = session?.user.role === 'owner';
   const queryClient = useQueryClient();
 
-  // Filtering — client-side/in-memory (endpoint gak dukung query param apapun,
-  // dan ini pure filtering atas data yang udah di-fetch — gak perlu debounce,
-  // beda dari BookingsBoard yang tiap ketikan trigger network request server-side).
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
 
@@ -149,14 +146,14 @@ export default function MenuCrudBoard() {
     onError: (error) => toast.error(apiErrorMessage(error, 'Failed to update category.')),
   });
 
-  const deactivateCategoryMutation = useMutation({
+  const deleteCategoryMutation = useMutation({
     mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
       queryClient.invalidateQueries({ queryKey: ['menu'] });
-      toast.success('Category deactivated.');
+      toast.success('Category deleted.');
     },
-    onError: (error) => toast.error(apiErrorMessage(error, 'Failed to deactivate category.')),
+    onError: (error) => toast.error(apiErrorMessage(error, 'Failed to delete category.')),
   });
 
   // ── MENU ITEM HANDLERS ──
@@ -278,15 +275,10 @@ export default function MenuCrudBoard() {
     }
   };
 
-  const handleDeactivateCategory = (category: MenuCategory) => {
+  const handleDeleteCategory = (category: MenuCategory) => {
     if (!isOwner) return;
-    const count = categoryItemCount(category.id);
-    const warning =
-      count > 0
-        ? `Deactivate "${category.name}"? This will hide ${count} menu item${count > 1 ? 's' : ''} from the public menu.`
-        : `Deactivate "${category.name}"?`;
-    if (!window.confirm(warning)) return;
-    deactivateCategoryMutation.mutate(category.id);
+    if (!window.confirm(`Delete "${category.name}"? This cannot be undone.`)) return;
+    deleteCategoryMutation.mutate(category.id);
   };
 
   const openAddCategoryModal = () => {
@@ -383,7 +375,12 @@ export default function MenuCrudBoard() {
                         onValueChange={(val) => setMenuForm({ ...menuForm, category_id: val ?? '' })}
                       >
                         <SelectTrigger className="border border-black/10 px-3 py-5.5 text-sm md:text-base font-bold uppercase tracking-wider bg-black/[0.01] focus:bg-white focus:border-black focus:ring-0 focus:ring-offset-0 rounded-none w-full h-auto text-left flex justify-between items-center">
-                          <SelectValue placeholder="SELECT CATEGORY" />
+                          <SelectValue placeholder="SELECT CATEGORY" >
+                            {(value) => {
+                              const cat = categories.find((c) => c.id === value);
+                              return cat ? categoryLabel(cat) : 'SELECT CATEGORY';
+                            }}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent className="border border-black/10 rounded-none bg-white p-0 shadow-xl z-50">
                           {categories.map((c) => (
@@ -701,11 +698,9 @@ export default function MenuCrudBoard() {
                       <button onClick={() => openEditCategoryModal(cat)} className="text-[2.4vw] md:text-[0.65vw] font-bold uppercase tracking-wider text-black/40 hover:text-black underline cursor-pointer">
                         Edit
                       </button>
-                      {cat.is_active && (
-                        <button onClick={() => handleDeactivateCategory(cat)} className="text-[2.4vw] md:text-[0.65vw] font-bold uppercase tracking-wider text-red-500/60 hover:text-red-600 underline cursor-pointer">
-                          Deactivate
-                        </button>
-                      )}
+                      <button onClick={() => handleDeleteCategory(cat)} className="text-[2.4vw] md:text-[0.65vw] font-bold uppercase tracking-wider text-red-500/60 hover:text-red-600 underline cursor-pointer">
+                        Delete
+                      </button>
                     </>
                   ) : (
                     <span className="text-[2vw] md:text-[0.6vw] font-bold text-black/20 uppercase tracking-widest">Locked</span>

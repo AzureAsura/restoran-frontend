@@ -69,16 +69,16 @@ export const BookingConfirmation = () => {
     return (
       <main className="w-full bg-canvas min-h-[90vh] flex flex-col items-center justify-center section-pad pt-[8vw] pb-[8vw] text-center gap-[3vw]">
         <h1 className="text-[6vw] md:text-[2vw] font-bold uppercase text-black">
-          Belum Ada Reservasi
+          No Reservation Found
         </h1>
         <p className="text-[3.5vw] md:text-[1vw] text-black/50 uppercase max-w-[80%] md:max-w-[35vw]">
-          Kami tidak menemukan data reservasi. Silakan buat booking baru terlebih dahulu.
+          We could not find any reservation data. Please make a new booking first.
         </p>
         <Link
           href="/booking"
           className="mt-[2vw] bg-black text-white text-[3.8vw] md:text-[1vw] font-bold uppercase tracking-widest px-[6vw] py-[3vw] md:px-[2.5vw] md:py-[1vw] hover:bg-black/80 transition-colors"
         >
-          Buat Reservasi
+          Make a Reservation
         </Link>
       </main>
     );
@@ -86,7 +86,7 @@ export const BookingConfirmation = () => {
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code);
-    toast.success('Kode booking disalin.');
+    toast.success('Booking code copied.');
   };
 
   const handleAddToCalendar = () => {
@@ -189,7 +189,7 @@ export const BookingConfirmation = () => {
           className="w-full border border-black text-black text-[3.8vw] md:text-[1vw] font-bold uppercase tracking-widest py-[3.5vw] md:py-[1vw] flex items-center justify-center gap-[2vw] md:gap-[0.8vw] hover:bg-black hover:text-white transition-colors duration-300 rounded-none"
         >
           <Calendar className="w-[4vw] h-[4vw] md:w-[1.1vw] md:h-[1.1vw]" />
-          Tambah ke Kalender
+          Add to Calendar
         </button>
 
         <div className="w-full border-t border-dashed border-black/10 pt-[4vw] md:pt-[2vw] flex flex-col gap-[1vw]">
@@ -197,7 +197,7 @@ export const BookingConfirmation = () => {
             Important Notice
           </span>
           <p className="text-[3.2vw] md:text-[0.85vw] font-medium text-black/50 uppercase leading-[1.4] tracking-tight">
-            MOHON DATANG 15 MENIT SEBELUM WAKTU BOOKING. MEJA DI-HOLD SELAMA 15 MENIT.
+            PLEASE ARRIVE 15 MINUTES BEFORE YOUR BOOKING TIME. YOUR TABLE WILL BE HELD FOR 15 MINUTES.
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowRight } from 'lucide-react';
 
@@ -40,7 +41,7 @@ const MenuItem: React.FC<MenuItemData> = ({ link, text, image, count }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <a
+            <Link
                 href={link}
                 className="grid grid-cols-12 items-center w-full section-pad py-[4vw] md:py-[3vw] relative z-10 text-black uppercase font-medium tracking-tight transition-colors duration-300"
             >
@@ -83,7 +84,7 @@ const MenuItem: React.FC<MenuItemData> = ({ link, text, image, count }) => {
                         )}
                     </AnimatePresence>
                 </div>
-            </a>
+            </Link>
 
             <AnimatePresence>
                 {isHovered && (

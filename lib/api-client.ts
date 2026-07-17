@@ -19,19 +19,23 @@ type ApiEnvelope<T> =
   | { success: true; data: T }
   | { success: false; error: { code: string; message: string } };
 
-export async function apiFetch<T = void>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function rawApiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const isFormData = options.body instanceof FormData;
 
-  const res = await fetch(`${API_URL}${path}`, {
+  return fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
     headers: isFormData
       ? options.headers
       : { "Content-Type": "application/json", ...options.headers },
   });
+}
+
+export async function apiFetch<T = void>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const res = await rawApiFetch(path, options);
 
   if (res.status === 204) {
     return undefined as T;
@@ -44,4 +48,32 @@ export async function apiFetch<T = void>(
   }
 
   return json.data;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
+}
+
+type ApiEnvelopePaginated<T> =
+  | { success: true; data: T; pagination: PaginationMeta }
+  | { success: false; error: { code: string; message: string } };
+
+// List endpoints that return `pagination` as a sibling of `data` (see
+// GET /admin/orders) — apiFetch() above only ever surfaces `data`, so this
+// variant exists specifically for endpoints with pagination metadata.
+export async function apiFetchPaginated<T = void>(
+  path: string,
+  options: RequestInit = {}
+): Promise<{ data: T; pagination: PaginationMeta }> {
+  const res = await rawApiFetch(path, options);
+  const json: ApiEnvelopePaginated<T> = await res.json();
+
+  if (!json.success) {
+    throw new ApiError(json.error.code, json.error.message, res.status);
+  }
+
+  return { data: json.data, pagination: json.pagination };
 }

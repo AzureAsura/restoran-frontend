@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 import { ArrowUpRight } from 'lucide-react';
 
@@ -29,7 +30,7 @@ export const Hero = () => {
 
                 <div className="md:col-span-5 lg:col-span-6 md:flex justify-end hidden">
 
-                    <a href="#menu" className="btn-split inline-flex">
+                    <Link href="/menu" className="btn-split inline-flex">
 
                         <span className="btn-split-label px-[2.5vw]">View Menu</span>
 
@@ -37,7 +38,7 @@ export const Hero = () => {
                             <ArrowUpRight strokeWidth={2.5} className="btn-split-arrow" />
                         </div>
 
-                    </a>
+                    </Link>
 
                 </div>
 
@@ -68,7 +69,7 @@ export const Hero = () => {
 
             <div className="flex w-full md:w-auto md:justify-end mt-[4vw] md:mt-0 section-pad md:hidden">
 
-                <a href="#menu" className="btn-split flex w-full justify-between">
+                <Link href="/menu" className="btn-split flex w-full justify-between">
 
                     <span className="btn-split-label px-[5vw]">View Menu</span>
 
@@ -78,7 +79,7 @@ export const Hero = () => {
 
                     </div>
 
-                </a>
+                </Link>
 
             </div>
 

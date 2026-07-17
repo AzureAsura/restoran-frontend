@@ -17,17 +17,23 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tansta
 import { toast } from 'sonner';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ReceiptDialog } from '@/components/admin/pos/Receipt';
 import { ApiError } from '@/lib/api-client';
 import { closeTable, tablesQueryOptions } from '@/lib/queries/tables';
 import { menuQueryOptions } from '@/lib/queries/menu';
+import { bookingsQueryOptions } from '@/lib/queries/bookings';
 import {
   activeOrdersQueryOptions,
   createOrder,
   orderBillQueryOptions,
-  updateOrderPaymentStatus,
+  payOrdersBatch,
 } from '@/lib/queries/orders';
 import { formatUsd } from '@/lib/utils';
-import type { MenuItem, PaymentStatus, Table } from '@/types/api';
+import type { MenuItem, OrderBill, Table } from '@/types/api';
+
+function getTodayDateString() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+}
 
 const ALL_CATEGORY_ID = 'all';
 const ESTIMATED_TAX_RATE = 0.10;
@@ -57,6 +63,7 @@ function tableStatusBadge(status: Table['status']) {
 export const POSBoard = () => {
   const { data: tables } = useSuspenseQuery({ ...tablesQueryOptions(), refetchInterval: 12000 });
   const { data: menuGroups } = useSuspenseQuery(menuQueryOptions());
+  const { data: todaysBookings } = useQuery(bookingsQueryOptions({ date: getTodayDateString() }));
   const queryClient = useQueryClient();
 
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
@@ -65,11 +72,23 @@ export const POSBoard = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerName, setCustomerName] = useState('');
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [lastAddedId, setLastAddedId] = useState<string | null>(null);
   const [mobileActivePanel, setMobileActivePanel] = useState<'TABLES' | 'MENU' | 'SUMMARY'>('MENU');
   const [checkoutTableId, setCheckoutTableId] = useState<string | null>(null);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
+  const [receiptBills, setReceiptBills] = useState<OrderBill[]>([]);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptAutoPrint, setReceiptAutoPrint] = useState(false);
+
+  const tableBookingsToday = selectedTable
+    ? (todaysBookings ?? []).filter(
+        (booking) =>
+          booking.table?.id === selectedTable.id &&
+          (booking.status === 'confirmed' || booking.status === 'seated')
+      )
+    : [];
 
   const categories = useMemo(() => menuGroups.map((group) => group.category), [menuGroups]);
 
@@ -99,6 +118,7 @@ export const POSBoard = () => {
       setSelectedTable(null);
       setCustomerPhone('');
       setCustomerName('');
+      setSelectedBookingId(null);
       setLastAddedId(null);
       setMobileActivePanel('MENU');
     },
@@ -117,41 +137,46 @@ export const POSBoard = () => {
     enabled: !!expandedOrderId,
   });
 
-  // Multi-order checkout: 1 meja bisa punya beberapa Order aktif (tamu nambah
-  // pesanan). Batch-pay cuma UI convenience (loop PATCH per order) — Kitchen
-  // tetap track tiap order independen, gak ada merge di database.
-  const unpaidOrderCount = activeOrdersQuery.data?.filter((order) => order.payment_status === 'unpaid').length ?? 0;
-  const showBatchPayUI = unpaidOrderCount >= 2;
   const allOrdersPaid =
-    // 0 order aktif juga valid buat di-close (mis. meja "nyangkut" occupied
-    // tanpa order tersisa) — [].every(...) vacuously true, backend juga
-    // ngizinin close tanpa order aktif sama sekali.
     !!activeOrdersQuery.data &&
     activeOrdersQuery.data.every((order) => order.payment_status === 'paid');
   const selectedOrdersTotal = (activeOrdersQuery.data ?? [])
     .filter((order) => selectedOrderIds.has(order.id))
     .reduce((sum, order) => sum + order.total, 0);
+  const selectedHasPaid = (activeOrdersQuery.data ?? [])
+    .filter((order) => selectedOrderIds.has(order.id))
+    .some((order) => order.payment_status === 'paid');
 
-  const markPaidMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: PaymentStatus }) => updateOrderPaymentStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Status pembayaran diperbarui.');
+  const fetchBillsFor = (orderIds: string[]) =>
+    Promise.all(orderIds.map((id) => queryClient.fetchQuery(orderBillQueryOptions(id))));
+
+  const printOnlyMutation = useMutation({
+    mutationFn: (orderIds: string[]) => fetchBillsFor(orderIds),
+    onSuccess: (bills) => {
+      setReceiptBills(bills);
+      setReceiptAutoPrint(false);
+      setReceiptOpen(true);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal memperbarui status pembayaran, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Gagal memuat struk, coba lagi.'));
     },
   });
 
-  const batchMarkPaidMutation = useMutation({
-    mutationFn: (ids: string[]) => Promise.all(ids.map((id) => updateOrderPaymentStatus(id, 'paid'))),
-    onSuccess: () => {
+  const payAndPrintMutation = useMutation({
+    mutationFn: async (orderIds: string[]) => {
+      await payOrdersBatch(orderIds);
+      return fetchBillsFor(orderIds);
+    },
+    onSuccess: (bills) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Semua order terpilih berhasil ditandai lunas.');
+      setReceiptBills(bills);
+      setReceiptAutoPrint(true);
+      setReceiptOpen(true);
       setSelectedOrderIds(new Set());
+      toast.success('Order berhasil ditandai lunas.');
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal memperbarui status pembayaran, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Gagal memproses pembayaran, coba lagi.'));
     },
   });
 
@@ -171,6 +196,7 @@ export const POSBoard = () => {
   const handleSelectTable = (table: Table) => {
     if (table.status === 'maintenance') return;
     setSelectedTable(table);
+    setSelectedBookingId(null);
     if (window.innerWidth < 768) setMobileActivePanel('MENU');
   };
 
@@ -222,6 +248,7 @@ export const POSBoard = () => {
 
     createOrderMutation.mutate({
       table_id: selectedTable.id,
+      ...(selectedBookingId ? { booking_id: selectedBookingId } : {}),
       ...(customerPhone.trim() ? { customer_phone: customerPhone.trim() } : {}),
       ...(customerName.trim() ? { customer_name: customerName.trim() } : {}),
       items: cart.map((item) => ({
@@ -268,7 +295,7 @@ export const POSBoard = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lastAddedId, cart, selectedTable]);
+  }, [lastAddedId, cart, selectedTable, selectedBookingId]);
 
   return (
     <div className="w-full h-full flex-1 grid grid-cols-12 bg-white border-t border-black/10 text-black font-sans select-none overflow-hidden rounded-none relative">
@@ -489,6 +516,26 @@ export const POSBoard = () => {
         </div>
 
         <div className="p-4 border-t border-black/10 bg-white flex flex-col gap-2 shrink-0 mb-16 md:mb-0">
+          {tableBookingsToday.length > 0 && (
+            <div className="flex flex-col gap-1 mb-1">
+              <span className="text-[9px] font-black text-black/40 uppercase">Link Ke Booking (Opsional)</span>
+              <div className="flex flex-col gap-1">
+                {tableBookingsToday.map((booking) => (
+                  <button
+                    key={booking.id}
+                    onClick={() => setSelectedBookingId(selectedBookingId === booking.id ? null : booking.id)}
+                    className={`text-left px-2 py-1.5 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${
+                      selectedBookingId === booking.id
+                        ? 'border-black bg-black text-white'
+                        : 'border-black/10 bg-white text-black/60 hover:border-black/40'
+                    }`}
+                  >
+                    {booking.customer_name} · {booking.booking_time}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <input
             type="text"
             placeholder="NAMA PELANGGAN (OPSIONAL)"
@@ -588,14 +635,12 @@ export const POSBoard = () => {
                 <div key={order.id} className="border border-black/10 p-3 flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      {showBatchPayUI && order.payment_status === 'unpaid' && (
-                        <input
-                          type="checkbox"
-                          checked={selectedOrderIds.has(order.id)}
-                          onChange={() => toggleOrderSelection(order.id)}
-                          className="w-3.5 h-3.5 accent-black cursor-pointer rounded-none"
-                        />
-                      )}
+                      <input
+                        type="checkbox"
+                        checked={selectedOrderIds.has(order.id)}
+                        onChange={() => toggleOrderSelection(order.id)}
+                        className="w-3.5 h-3.5 accent-black cursor-pointer rounded-none"
+                      />
                       <span className="text-xs font-bold uppercase text-black/50">
                         {order.customer_name ? `${order.customer_name} · ` : ''}
                         {order.items.length} item(s) — {new Date(order.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
@@ -643,32 +688,32 @@ export const POSBoard = () => {
                       )}
                     </div>
                   )}
-
-                  {order.payment_status === 'unpaid' && (
-                    <button
-                      onClick={() => markPaidMutation.mutate({ id: order.id, status: 'paid' })}
-                      disabled={markPaidMutation.isPending}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-black/80 transition-colors disabled:opacity-50 cursor-pointer"
-                    >
-                      <CheckCircle2 className="w-3 h-3" /> Tandai Lunas
-                    </button>
-                  )}
                 </div>
               ))}
 
-              {showBatchPayUI && selectedOrderIds.size > 0 && (
+              {selectedOrderIds.size > 0 && (
                 <div className="border border-black bg-black/[0.02] p-3 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-xs font-bold uppercase text-black/60">
                     <span>{selectedOrderIds.size} Order Terpilih</span>
                     <span className="text-black">{formatUsd(selectedOrdersTotal)}</span>
                   </div>
-                  <button
-                    onClick={() => batchMarkPaidMutation.mutate([...selectedOrderIds])}
-                    disabled={batchMarkPaidMutation.isPending}
-                    className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-black/80 transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <CheckCircle2 className="w-3 h-3" /> Bayar Semua yang Dipilih
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => printOnlyMutation.mutate([...selectedOrderIds])}
+                      disabled={printOnlyMutation.isPending}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider border border-black/10 text-black/70 hover:enabled:bg-black hover:enabled:text-white transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <Receipt className="w-3 h-3" /> Cetak Struk
+                    </button>
+                    <button
+                      onClick={() => payAndPrintMutation.mutate([...selectedOrderIds])}
+                      disabled={payAndPrintMutation.isPending || selectedHasPaid}
+                      title={selectedHasPaid ? 'Order yang sudah lunas tidak bisa dibayar ulang.' : undefined}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-black/80 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-3 h-3" /> Tandai Lunas & Cetak
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -684,6 +729,13 @@ export const POSBoard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <ReceiptDialog
+        bills={receiptBills}
+        open={receiptOpen}
+        onOpenChange={setReceiptOpen}
+        autoPrint={receiptAutoPrint}
+      />
 
     </div>
   );

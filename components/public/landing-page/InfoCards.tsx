@@ -46,7 +46,7 @@ const InfoCards = () => {
               Megatha Restaurant & Lounge
             </p>
             <p className="text-[3.8vw] md:text-[0.95vw] font-medium text-black/50 uppercase leading-[1.4] tracking-tight max-w-[85vw] md:max-w-none mx-auto">
-              248 Øvregaten, Bergen, Hordaland, Norway
+              Jl. Sunset Road No. 88, Seminyak, Bali, Indonesia
             </p>
           </div>
         </div>
@@ -62,8 +62,8 @@ const InfoCards = () => {
           <div className="flex flex-col gap-[3vw] md:gap-[0.8vw] border-t border-black/5 pt-[4vw] md:pt-[1.5vw] mt-[4vw] md:mt-[2vw] w-full">
             <div className="flex flex-col">
               <span className="text-[2.8vw] md:text-[0.7vw] font-bold text-black/40 uppercase tracking-widest">Phone Call</span>
-              <a href="tel:+4755321000" className="text-[4vw] md:text-[1.1vw] font-bold text-black uppercase tracking-tight hover:text-[#6E3A2F] transition-colors duration-300">
-                +47 5532 1000
+              <a href="tel:+623611234567" className="text-[4vw] md:text-[1.1vw] font-bold text-black uppercase tracking-tight hover:text-[#6E3A2F] transition-colors duration-300">
+                +62 361 123 4567
               </a>
             </div>
             <div className="flex flex-col mt-[2vw] md:mt-0">

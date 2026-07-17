@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ApiError } from '@/lib/api-client';
 import { bookingsQueryOptions, updateBookingStatus } from '@/lib/queries/bookings';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
@@ -60,6 +61,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
   const [searchInput, setSearchInput]   = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | BookingStatus>('ALL');
   const [areaFilter, setAreaFilter]     = useState<'ALL' | Area>('ALL');
+  const [noteBooking, setNoteBooking]   = useState<Booking | null>(null);
 
   const debouncedSearch = useDebouncedValue(searchInput, 300);
   const queryClient = useQueryClient();
@@ -112,8 +114,8 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
   };
 
   // special_requests + histori customer (total_visits/no_show_count) — dipakai
-  // di List view (table + card), gak dipasang di Timeline karena kartunya
-  // sengaja kecil buat scan cepat, bukan detail penuh.
+  // di List view (table + card). Badge Note sekarang jadi button yang membuka
+  // dialog berisi isi special_requests (sebelumnya cuma title/tooltip).
   const renderCustomerMeta = (booking: Booking) => {
     const hasHistory = booking.customer && (booking.customer.total_visits > 0 || booking.customer.no_show_count > 0);
     if (!booking.special_requests && !hasHistory) return null;
@@ -121,12 +123,13 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
     return (
       <div className="flex items-center gap-1.5 flex-wrap">
         {booking.special_requests && (
-          <span
-            title={booking.special_requests}
-            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 border border-black/10 text-black/50 bg-black/[0.02]"
+          <button
+            type="button"
+            onClick={() => setNoteBooking(booking)}
+            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer"
           >
             <MessageSquareText className="w-3 h-3" /> Note
-          </span>
+          </button>
         )}
         {booking.customer && booking.customer.total_visits > 0 && (
           <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 border border-blue-100 text-blue-500 bg-blue-50">
@@ -495,6 +498,23 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
 
         </div>
       )}
+
+      <Dialog open={!!noteBooking} onOpenChange={(open) => !open && setNoteBooking(null)}>
+        <DialogContent className="rounded-none border-black/10 max-w-[90%] sm:max-w-[420px] p-6 md:p-[2vw] bg-white flex flex-col gap-4 md:gap-[1.2vw]">
+          <DialogHeader className="border-b border-black/5 pb-3 md:pb-[1vw]">
+            <span className="text-[10px] font-bold text-black/40 uppercase tracking-widest leading-none">
+              {noteBooking?.booking_time} · {noteBooking?.table?.name ?? '—'}
+            </span>
+            <DialogTitle className="text-lg md:text-[1.2vw] font-bold text-black uppercase mt-1 leading-none">
+              Catatan — {noteBooking?.customer_name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm md:text-[0.9vw] font-medium text-black/80 leading-relaxed whitespace-pre-wrap">
+            {noteBooking?.special_requests}
+          </p>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

@@ -14,7 +14,7 @@ const MenuCategory = ({ categories, activeCategoryId, onSelect }: MenuCategoryPr
   const tabs = [{ id: ALL_CATEGORY_ID, name: 'All' }, ...categories];
 
   return (
-    <div className="md:col-span-3 md:sticky md:top-[4vw] flex flex-row md:flex-col gap-[4vw] md:gap-[2.5vw] overflow-x-auto md:overflow-visible no-scrollbar pb-[4vw] md:pb-0 border-b border-black/5 md:border-b-0">
+    <div className="md:col-span-3 md:sticky md:top-[8vw] flex flex-row md:flex-col gap-[4vw] md:gap-[2.5vw] overflow-x-auto md:overflow-visible no-scrollbar pb-[4vw] md:pb-0 border-b border-black/5 md:border-b-0">
       {tabs.map((tab) => {
         const isActive = activeCategoryId === tab.id;
         return (

@@ -11,6 +11,7 @@ export const ADMIN_ROUTE_ROLES: Record<string, StaffRole[]> = {
   pos: ['owner', 'cashier'],
   kitchen: ['owner', 'kitchen'],
   menu: ['owner', 'cashier'],
+  finance: ['owner'],
   settings: ['owner'],
 };
 

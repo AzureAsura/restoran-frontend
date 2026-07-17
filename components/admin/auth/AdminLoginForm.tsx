@@ -31,7 +31,7 @@ export const AdminLoginForm = () => {
   const errorMessage = signInMutation.isError
     ? signInMutation.error instanceof AuthError
       ? signInMutation.error.message
-      : 'Gagal login, coba lagi.'
+      : 'Login failed, please try again.'
     : null;
 
   return (
@@ -50,18 +50,8 @@ export const AdminLoginForm = () => {
         </div>
 
         <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
-          SISTEM MANAJEMEN INTERNAL RESERVASI, POINT OF SALE, DAN MONITORING DAPUR UTAMA. HARAP JAGA KERAHASIAAN KREDENSIAL AKSES ANDA.
+          INTERNAL MANAGEMENT SYSTEM FOR RESERVATIONS, POINT OF SALE, AND KITCHEN MONITORING. PLEASE KEEP YOUR ACCESS CREDENTIALS CONFIDENTIAL.
         </p>
-
-        {/* <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
-          Owner: owner@warungbagas.id / Owner#12345
-        </p>
-        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
-          Cashier: cashier@warungbagas.id / Cashier#12345
-        </p>
-        <p className="text-[3.8vw] md:text-[1.05vw] font-medium text-black/50 uppercase tracking-tight leading-[1.4] max-w-[85%] md:max-w-[90%]">
-          Kitchen: kitchen@warungbagas.id / Kitchen#12345
-        </p> */}
 
       </div>
 
@@ -71,11 +61,11 @@ export const AdminLoginForm = () => {
 
           <div className="flex flex-col gap-[1.5vw] md:gap-[0.5vw] w-full">
             <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black text-center md:text-left">
-              Email Staf
+              Staff Email
             </label>
             <input
               type="email"
-              placeholder="CONTOH: OWNER@THEFJORDS.COM"
+              placeholder="E.G. OWNER@MEGATHA.COM"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -87,7 +77,7 @@ export const AdminLoginForm = () => {
 
           <div className="flex flex-col gap-[1.5vw] md:gap-[0.5vw] w-full relative">
             <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black text-center md:text-left">
-              Kata Sandi
+              Password
             </label>
             <div className="w-full flex items-center relative">
               <input
@@ -120,7 +110,7 @@ export const AdminLoginForm = () => {
             className="w-full bg-black text-white text-[4vw] md:text-[1.1vw] font-bold uppercase tracking-widest py-[4vw] md:py-[1.2vw] flex items-center justify-center gap-[2vw] md:gap-[0.8vw] hover:bg-black/80 transition-colors duration-300 rounded-none shadow-lg shadow-black/[0.02] mt-[2vw] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShieldCheck className="w-[4.5vw] h-[4.5vw] md:w-[1.2vw] md:h-[1.2vw]" />
-            {signInMutation.isPending ? 'Memverifikasi...' : 'Authorize & Enter Terminal'}
+            {signInMutation.isPending ? 'Verifying...' : 'Authorize & Enter Terminal'}
           </button>
 
           {errorMessage && (

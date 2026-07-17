@@ -148,6 +148,10 @@ export interface Order {
   total: number;
   status: OrderStatus;
   payment_status: PaymentStatus;
+  // null = paid alone (single PATCH); shared across every order paid+printed
+  // together via POST /admin/orders/pay-batch.
+  payment_group_id: string | null;
+  paid_at: string | null;
   items: OrderItem[];
   created_at: string;
   updated_at: string;
@@ -165,12 +169,20 @@ export interface OrderBillItem {
 
 export interface OrderBill {
   order_id: string;
+  // Struk header — this DTO doubles as the printable receipt.
+  restaurant: {
+    name: string;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+  };
   table: {
     id: string;
     name: string;
     area: Area;
   };
   payment_status: PaymentStatus;
+  paid_at: string | null;
   items: OrderBillItem[];
   subtotal: number;
   subtotal_formatted: string;
@@ -225,6 +237,110 @@ export interface MenuPerformanceEntry {
   menu_item_id: string;
   name: string;
   order_count: number;
+}
+
+// ── Keuangan (/admin/finance) ──
+
+export type RevenuePeriod = "week" | "month" | "year";
+
+interface AnalyticsPeriodRange {
+  period: RevenuePeriod;
+  range: { start: string; end: string };
+}
+
+export interface RevenueSeriesEntry {
+  bucket: string;
+  label: string;
+  revenue: number;
+  revenue_formatted: string;
+  // Distinct payment_group_id (fallback to order id) within this bucket —
+  // a merged struk counts once, not once per underlying order.
+  order_count: number;
+}
+
+export interface RevenueByCategoryEntry {
+  category_id: string;
+  category: string;
+  revenue: number;
+  revenue_formatted: string;
+  qty_sold: number;
+}
+
+export interface RevenueByHourEntry {
+  hour: string;
+  revenue: number;
+  revenue_formatted: string;
+}
+
+export interface RevenueReport extends AnalyticsPeriodRange {
+  summary: {
+    total_revenue: number;
+    total_revenue_formatted: string;
+    subtotal: number;
+    tax: number;
+    service_charge: number;
+    order_count: number;
+    avg_order_value: number;
+    avg_order_value_formatted: string;
+  };
+  previous_period: {
+    total_revenue: number;
+    total_revenue_formatted: string;
+    // null when the previous period had zero revenue — growth % is
+    // undefined there, not a misleading number.
+    growth_percent: number | null;
+  };
+  by_category: RevenueByCategoryEntry[];
+  by_hour: RevenueByHourEntry[];
+  series: RevenueSeriesEntry[];
+}
+
+export type WeekdayName =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+export interface ReservationAnalytics extends AnalyticsPeriodRange {
+  occupancy: { avg_rate_percent: number };
+  no_show: {
+    count: number;
+    // Denominator for rate_percent: bookings whose outcome is resolved
+    // (completed + no_show only) — a still-confirmed or cancelled booking
+    // was never a "did they show up" question.
+    resolved_count: number;
+    rate_percent: number;
+    estimated_lost_revenue: number;
+    estimated_lost_revenue_formatted: string;
+  };
+  popular_times: {
+    by_day_of_week: { day: WeekdayName; booking_count: number }[];
+    by_hour: { hour: string; booking_count: number }[];
+  };
+}
+
+export interface MenuFinancialItem {
+  menu_item_id: string;
+  name: string;
+  qty_sold: number;
+  revenue: number;
+  revenue_formatted: string;
+}
+
+export interface MenuFinancialCrossSellPair {
+  menu_item_a: { id: string; name: string };
+  menu_item_b: { id: string; name: string };
+  pair_count: number;
+}
+
+export interface MenuFinancials extends AnalyticsPeriodRange {
+  // Every active menu item, including ones never ordered (qty_sold: 0) —
+  // sort ascending client-side for "rarely ordered".
+  items: MenuFinancialItem[];
+  cross_sell: MenuFinancialCrossSellPair[];
 }
 
 export type StaffRole = "owner" | "cashier" | "kitchen";

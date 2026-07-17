@@ -8,6 +8,8 @@ import MenuCategory, { ALL_CATEGORY_ID } from './MenuCategory';
 import { menuQueryOptions } from '@/lib/queries/menu';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { formatUsd } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import type { MenuItem } from '@/types/api';
 
 interface MenuSectionProps {
   initialCategory?: string;
@@ -26,6 +28,7 @@ export const MenuSection = ({ initialCategory }: MenuSectionProps) => {
   });
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 300);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const categories = useMemo(() => data.map((group) => group.category), [data]);
 
@@ -93,7 +96,10 @@ export const MenuSection = ({ initialCategory }: MenuSectionProps) => {
             visibleItems.map((item) => (
               <div key={item.id} className="w-full flex flex-col gap-[1.5vw]">
 
-                <div className="w-full aspect-[4/4] bg-black/5 overflow-hidden rounded-none border border-black/5 group cursor-pointer relative">
+                <div
+                  onClick={() => setSelectedItem(item)}
+                  className="w-full aspect-[4/4] bg-black/5 overflow-hidden rounded-none border border-black/5 group cursor-pointer relative"
+                >
                   {item.image_url && (
                     <img
                       src={item.image_url}
@@ -106,13 +112,21 @@ export const MenuSection = ({ initialCategory }: MenuSectionProps) => {
 
                 <div className="flex flex-col gap-[0.4vw]">
                   <div className="flex justify-between items-start gap-[1vw]">
-                    <h3 className="text-[4.2vw] md:text-[1.15vw] font-bold uppercase text-black tracking-tight leading-[1.2] max-w-[80%]">
+                    <h3
+                      onClick={() => setSelectedItem(item)}
+                      className="text-[4.2vw] md:text-[1.15vw] font-bold uppercase text-black tracking-tight leading-[1.2] max-w-[80%] truncate cursor-pointer hover:text-[#6E3A2F] transition-colors"
+                    >
                       {item.name}
                     </h3>
-                    <span className="text-[3.8vw] md:text-[1.05vw] font-semibold text-[#6E3A2F]">
+                    <span className="text-[3.8vw] md:text-[1.05vw] font-semibold text-[#6E3A2F] shrink-0">
                       {formatUsd(item.price)}
                     </span>
                   </div>
+                  {item.description && (
+                    <p className="text-[3.2vw] md:text-[0.85vw] text-black/50 leading-snug line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
 
               </div>
@@ -121,6 +135,52 @@ export const MenuSection = ({ initialCategory }: MenuSectionProps) => {
         </div>
 
       </div>
+
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="rounded-none border-black/10 max-w-[90%] sm:max-w-[520px] p-0 bg-white gap-0 overflow-hidden">
+          <div className="w-full aspect-[4/3] bg-black/5 overflow-hidden border-b border-black/5">
+            {selectedItem?.image_url ? (
+              <img
+                src={selectedItem.image_url}
+                alt={selectedItem.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-black/10" />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-[3vw] md:gap-[1vw] p-[6vw] md:p-[2vw]">
+            <DialogHeader className="flex flex-row justify-between items-start gap-[2vw]">
+              <DialogTitle className="text-[5vw] md:text-[1.4vw] font-bold uppercase text-black tracking-tight leading-[1.15]">
+                {selectedItem?.name}
+              </DialogTitle>
+              <span className="text-[4vw] md:text-[1.15vw] font-semibold text-[#6E3A2F] shrink-0 mt-[0.3vw]">
+                {formatUsd(selectedItem?.price ?? 0)}
+              </span>
+            </DialogHeader>
+
+            {selectedItem?.description && (
+              <p className="text-[3.5vw] md:text-[0.9vw] text-black/60 leading-relaxed">
+                {selectedItem.description}
+              </p>
+            )}
+
+            {selectedItem && selectedItem.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {selectedItem.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-black/5 px-2 py-1 text-[2.6vw] md:text-[0.7vw] font-bold text-black/60 tracking-wide uppercase"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };

@@ -56,12 +56,6 @@ export const AdminTopbar = ({ onMenuTrigger }: TopbarProps) => {
 
         {isProfileDropdownOpen && (
           <div className="absolute right-0 top-[14vw] md:top-[3.5vw] w-[45vw] md:w-[12vw] bg-white border border-black/10 shadow-xl flex flex-col rounded-none overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-            <a
-              href="#profile"
-              className="px-[4vw] py-[3vw] md:px-[1.2vw] md:py-[0.8vw] text-[3.5vw] md:text-[0.85vw] font-bold uppercase text-black/70 hover:text-black hover:bg-black/[0.02] transition-colors border-b border-black/5"
-            >
-              My Profile
-            </a>
             <button
               type="button"
               onClick={() => signOutMutation.mutate()}

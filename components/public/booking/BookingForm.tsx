@@ -22,22 +22,22 @@ function getTodayDateString() {
 }
 
 const bookingFormSchema = z.object({
-  customer_name: z.string().trim().min(1, 'Nama lengkap wajib diisi.'),
+  customer_name: z.string().trim().min(1, 'Full name is required.'),
   customer_phone: z
     .string()
-    .regex(/^08\d{8,11}$/, 'Format nomor HP Indonesia tidak valid (contoh: 08123456789).'),
+    .regex(/^08\d{8,11}$/, 'Invalid Indonesian phone number format (e.g. 08123456789).'),
   party_size: z.coerce
-    .number('Jumlah orang wajib diisi.')
-    .int('Jumlah orang harus berupa angka bulat.')
-    .min(1, 'Jumlah orang harus berkisar antara 1 sampai 20 orang.')
-    .max(20, 'Jumlah orang harus berkisar antara 1 sampai 20 orang.'),
+    .number('Party size is required.')
+    .int('Party size must be a whole number.')
+    .min(1, 'Party size must be between 1 and 20 people.')
+    .max(20, 'Party size must be between 1 and 20 people.'),
   booking_date: z
     .string()
-    .min(1, 'Tanggal reservasi wajib diisi.')
-    .refine((value) => value >= getTodayDateString(), 'Tanggal reservasi tidak boleh di masa lalu.'),
-  booking_time: z.enum(TIME_SLOTS, { error: 'Silakan pilih jam kunjungan yang tersedia.' }),
+    .min(1, 'Reservation date is required.')
+    .refine((value) => value >= getTodayDateString(), 'Reservation date cannot be in the past.'),
+  booking_time: z.enum(TIME_SLOTS, { error: 'Please select an available time slot.' }),
   area_preference: z.enum(['indoor', 'outdoor', 'no_preference'], {
-    error: 'Pilih salah satu preferensi area meja.',
+    error: 'Please select a table area preference.',
   }),
   // Backend: .trim().min(1).optional() — field boleh absen, tapi kalau ADA harus
   // non-kosong. Textarea kosong secara native kasih string "", bukan undefined,
@@ -84,7 +84,7 @@ export const BookingForm = () => {
     },
     onError: (error) => {
       toast.error(
-        error instanceof ApiError ? error.message : 'Gagal membuat reservasi, coba lagi.'
+        error instanceof ApiError ? error.message : 'Failed to create reservation, please try again.'
       );
     },
   });
@@ -133,11 +133,11 @@ export const BookingForm = () => {
 
             <div className="flex flex-col gap-[1vw] md:gap-[0.5vw] w-full">
               <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                Nama Lengkap
+                Full Name
               </label>
               <input
                 type="text"
-                placeholder="NAMA ANDA"
+                placeholder="YOUR NAME"
                 {...register('customer_name')}
                 className={`w-full bg-transparent border-b ${errors.customer_name ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none uppercase tracking-wide transition-colors`}
               />
@@ -152,11 +152,11 @@ export const BookingForm = () => {
 
               <div className="flex flex-col gap-[1vw] md:gap-[0.5vw]">
                 <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                  Nomor HP
+                  Phone Number
                 </label>
                 <input
                   type="text"
-                  placeholder="CONTOH: 08123456789"
+                  placeholder="E.G. 08123456789"
                   {...register('customer_phone')}
                   className={`w-full bg-transparent border-b ${errors.customer_phone ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none tracking-wide transition-colors`}
                 />
@@ -169,13 +169,13 @@ export const BookingForm = () => {
 
               <div className="flex flex-col gap-[1vw] md:gap-[0.5vw]">
                 <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                  Jumlah Orang
+                  Party Size
                 </label>
                 <input
                   type="number"
                   min="1"
                   max="20"
-                  placeholder="1 - 20 ORANG"
+                  placeholder="1 - 20 PEOPLE"
                   {...register('party_size')}
                   className={`w-full bg-transparent border-b ${errors.party_size ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none uppercase tracking-wide transition-colors`}
                 />
@@ -191,7 +191,7 @@ export const BookingForm = () => {
 
               <div className="flex flex-col gap-[1vw] md:gap-[0.5vw]">
                 <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                  Tanggal Reservasi
+                  Reservation Date
                 </label>
                 <input
                   type="date"
@@ -208,14 +208,14 @@ export const BookingForm = () => {
 
               <div className="flex flex-col gap-[1vw] md:gap-[0.5vw]">
                 <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                  Waktu Kunjungan
+                  Visit Time
                 </label>
                 <select
                   defaultValue=""
                   {...register('booking_time')}
                   className={`w-full bg-transparent border-b ${errors.booking_time ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black focus:outline-none uppercase tracking-wide transition-colors appearance-none`}
                 >
-                  <option value="" disabled className="text-black bg-canvas">PILIH JAM KUNJUNGAN</option>
+                  <option value="" disabled className="text-black bg-canvas">SELECT VISIT TIME</option>
                   {TIME_SLOTS.map((slot) => (
                     <option key={slot} value={slot} className="text-black bg-canvas">{slot}</option>
                   ))}
@@ -261,11 +261,11 @@ export const BookingForm = () => {
 
             <div className="flex flex-col gap-[1vw] md:gap-[0.5vw] w-full pt-[1vw]">
               <label className="text-[3vw] md:text-[0.8vw] font-bold uppercase tracking-wider text-black">
-                Catatan Khusus
+                Special Requests
               </label>
               <textarea
                 rows={3}
-                placeholder="ALERGI MAKANAN, PERAYAAN ULANG TAHUN, ATAU PERMINTAAN KHUSUS LAINNYA..."
+                placeholder="FOOD ALLERGIES, BIRTHDAY CELEBRATIONS, OR OTHER SPECIAL REQUESTS..."
                 {...register('special_requests')}
                 className="w-full bg-transparent border-b border-black/20 focus:border-black pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none uppercase tracking-wide resize-none transition-colors"
               />
@@ -276,7 +276,7 @@ export const BookingForm = () => {
               disabled={bookingMutation.isPending}
               className="w-full bg-black text-white text-[4vw] md:text-[1.1vw] font-bold uppercase tracking-widest py-[4vw] md:py-[1.2vw] mt-[2vw] hover:bg-black/80 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {bookingMutation.isPending ? 'Memproses...' : 'Confirm Reservation'}
+              {bookingMutation.isPending ? 'Processing...' : 'Confirm Reservation'}
             </button>
 
           </form>

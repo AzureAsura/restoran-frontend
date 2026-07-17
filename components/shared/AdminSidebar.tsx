@@ -9,6 +9,7 @@ import {
   MonitorCheck,
   ChefHat,
   UtensilsCrossed,
+  Wallet,
   X,
   ChevronLeft,
   ChevronRight,
@@ -30,6 +31,7 @@ const allNavLinks = [
   { name: 'Point of Sale (POS)', href: '/admin/pos', icon: MonitorCheck },
   { name: 'Kitchen Monitor', href: '/admin/kitchen', icon: ChefHat },
   { name: 'Menu Editor', href: '/admin/menu', icon: UtensilsCrossed },
+  { name: 'Finance', href: '/admin/finance', icon: Wallet },
 ];
 
 export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggleCollapse }: SidebarProps) => {
@@ -61,7 +63,7 @@ export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggl
                 </span>
               </>
             ) : (
-              <span className="font-bold text-black uppercase text-lg">P</span>
+              <span className="font-bold text-black uppercase text-lg">M</span>
             )}
           </div>
 
