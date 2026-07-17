@@ -53,7 +53,7 @@ export function ReceiptDialog({ bills, open, onOpenChange, autoPrint = false }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-none border-black/10 w-[90%] sm:w-full sm:max-w-[400px] p-0 bg-white gap-0 overflow-hidden flex flex-col max-h-[90vh]">
         <DialogHeader className="border-b border-black/5 p-4 shrink-0">
-          <DialogTitle className="text-sm font-black text-black uppercase tracking-widest">Struk</DialogTitle>
+          <DialogTitle className="text-sm font-black text-black uppercase tracking-widest">Receipt</DialogTitle>
         </DialogHeader>
 
         <div className="overflow-y-auto">
@@ -116,7 +116,7 @@ export function ReceiptDialog({ bills, open, onOpenChange, autoPrint = false }: 
                   isPaid ? 'border-green-200 bg-green-50 text-green-600' : 'border-amber-200 bg-amber-50 text-amber-600'
                 }`}
               >
-                {isPaid ? 'Lunas' : 'Belum Dibayar'}
+                {isPaid ? 'Paid' : 'Unpaid'}
               </span>
             </div>
           </div>
@@ -127,7 +127,7 @@ export function ReceiptDialog({ bills, open, onOpenChange, autoPrint = false }: 
             onClick={() => window.print()}
             className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-black/80 transition-colors cursor-pointer"
           >
-            <Printer className="w-3 h-3" /> Cetak Struk
+            <Printer className="w-3 h-3" /> Print Receipt
           </button>
         </div>
       </DialogContent>

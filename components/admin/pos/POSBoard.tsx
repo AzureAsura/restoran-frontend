@@ -113,7 +113,7 @@ export const POSBoard = () => {
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(`Order berhasil dikirim ke ${order.table.name}.`);
+      toast.success(`Order sent to ${order.table.name}.`);
       setCart([]);
       setSelectedTable(null);
       setCustomerPhone('');
@@ -123,7 +123,7 @@ export const POSBoard = () => {
       setMobileActivePanel('MENU');
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal mengirim order, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to send order, please try again.'));
     },
   });
 
@@ -158,7 +158,7 @@ export const POSBoard = () => {
       setReceiptOpen(true);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal memuat struk, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to load receipt, please try again.'));
     },
   });
 
@@ -173,10 +173,10 @@ export const POSBoard = () => {
       setReceiptAutoPrint(true);
       setReceiptOpen(true);
       setSelectedOrderIds(new Set());
-      toast.success('Order berhasil ditandai lunas.');
+      toast.success('Order marked as paid.');
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal memproses pembayaran, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to process payment, please try again.'));
     },
   });
 
@@ -185,11 +185,11 @@ export const POSBoard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Meja ditandai tersedia kembali.');
+      toast.success('Table marked as available again.');
       closeCheckout();
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal mengubah status meja, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to update table status, please try again.'));
     },
   });
 
@@ -236,12 +236,12 @@ export const POSBoard = () => {
 
   const handleSubmitToKitchen = () => {
     if (!selectedTable) {
-      toast.error('Pilih meja terlebih dahulu.');
+      toast.error('Please select a table first.');
       setMobileActivePanel('TABLES');
       return;
     }
     if (cart.length === 0) {
-      toast.error('Keranjang belanja masih kosong.');
+      toast.error('Cart is still empty.');
       setMobileActivePanel('MENU');
       return;
     }
@@ -307,7 +307,7 @@ export const POSBoard = () => {
           <h2 className="text-xs font-black uppercase tracking-widest text-black/50 flex items-center gap-2">
             <Layers className="w-3.5 h-3.5" /> FLOOR PLAN
           </h2>
-          <p className="text-[10px] text-black/40 font-bold uppercase">KLIK UNTUK PILIH MEJA</p>
+          <p className="text-[10px] text-black/40 font-bold uppercase">CLICK TO SELECT TABLE</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 grid grid-cols-3 md:grid-cols-1 gap-2 content-start pb-20 md:pb-4">
@@ -384,7 +384,7 @@ export const POSBoard = () => {
             <Search className="w-4 h-4 text-black/30 absolute left-3" />
             <input
               type="text"
-              placeholder="CARI ITEM MENU..."
+              placeholder="SEARCH MENU ITEM..."
               value={searchMenu}
               onChange={(e) => setSearchMenu(e.target.value)}
               className="w-full bg-black/[0.02] border border-black/10 focus:border-black focus:bg-white pl-9 pr-4 py-2 text-xs font-bold uppercase tracking-wider placeholder:text-black/30 focus:outline-none transition-all rounded-none"
@@ -475,7 +475,7 @@ export const POSBoard = () => {
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 border border-dashed border-black/10 my-auto rounded-none">
               <ChefHat className="w-8 h-8 text-black/20 mb-2 stroke-[1.5]" />
-              <p className="text-xs font-black uppercase tracking-wider text-black/40">Belum Ada Pesanan</p>
+              <p className="text-xs font-black uppercase tracking-wider text-black/40">No Orders Yet</p>
             </div>
           ) : (
             cart.map((item) => {
@@ -503,7 +503,7 @@ export const POSBoard = () => {
                     </div>
                     <input
                       type="text"
-                      placeholder="CATATAN..."
+                      placeholder="NOTES..."
                       value={item.notes}
                       onChange={(e) => handleUpdateNotes(item.menuItemId, e.target.value)}
                       className="w-full bg-black/[0.02] border border-black/5 px-2 py-1.5 text-[10px] font-bold uppercase tracking-wide focus:outline-none focus:bg-white focus:border-black rounded-none"
@@ -518,7 +518,7 @@ export const POSBoard = () => {
         <div className="p-4 border-t border-black/10 bg-white flex flex-col gap-2 shrink-0 mb-16 md:mb-0">
           {tableBookingsToday.length > 0 && (
             <div className="flex flex-col gap-1 mb-1">
-              <span className="text-[9px] font-black text-black/40 uppercase">Link Ke Booking (Opsional)</span>
+              <span className="text-[9px] font-black text-black/40 uppercase">Link To Booking (Optional)</span>
               <div className="flex flex-col gap-1">
                 {tableBookingsToday.map((booking) => (
                   <button
@@ -538,14 +538,14 @@ export const POSBoard = () => {
           )}
           <input
             type="text"
-            placeholder="NAMA PELANGGAN (OPSIONAL)"
+            placeholder="CUSTOMER NAME (OPTIONAL)"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             className="w-full bg-black/[0.02] border border-black/5 px-2 py-1.5 text-[10px] font-bold uppercase tracking-wide focus:outline-none focus:bg-white focus:border-black rounded-none"
           />
           <input
             type="tel"
-            placeholder="NO. HP PELANGGAN (OPSIONAL)"
+            placeholder="CUSTOMER PHONE (OPTIONAL)"
             value={customerPhone}
             onChange={(e) => setCustomerPhone(e.target.value)}
             className="w-full bg-black/[0.02] border border-black/5 px-2 py-1.5 text-[10px] font-bold uppercase tracking-wide focus:outline-none focus:bg-white focus:border-black rounded-none mb-1"
@@ -555,7 +555,7 @@ export const POSBoard = () => {
             <span>{formatUsd(subtotal)}</span>
           </div>
           <div className="flex justify-between items-center text-xs font-medium text-black/60">
-            <span className="uppercase">Pajak (10%)</span>
+            <span className="uppercase">Tax (10%)</span>
             <span>{formatUsd(estimatedTax)}</span>
           </div>
           <div className="flex justify-between items-center text-xs font-medium text-black/60">
@@ -574,7 +574,7 @@ export const POSBoard = () => {
               cart.length > 0 && !createOrderMutation.isPending ? 'bg-black text-white border-black hover:bg-black/90 cursor-pointer' : 'bg-black/5 text-black/20 border-black/5 cursor-not-allowed'
             }`}
           >
-            <ChefHat className="w-4 h-4" /> {createOrderMutation.isPending ? 'MENGIRIM...' : 'KIRIM KE KITCHEN'}
+            <ChefHat className="w-4 h-4" /> {createOrderMutation.isPending ? 'SENDING...' : 'SEND TO KITCHEN'}
           </button>
         </div>
       </div>
@@ -587,7 +587,7 @@ export const POSBoard = () => {
           }`}
         >
           <Grid className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider">Meja ({selectedTable ? selectedTable.name : 'None'})</span>
+          <span className="text-[9px] uppercase tracking-wider">Table ({selectedTable ? selectedTable.name : 'None'})</span>
         </button>
 
         <button
@@ -625,11 +625,11 @@ export const POSBoard = () => {
           </DialogHeader>
 
           {activeOrdersQuery.isLoading ? (
-            <p className="text-center text-sm text-black/30 font-medium uppercase py-6">Memuat order...</p>
+            <p className="text-center text-sm text-black/30 font-medium uppercase py-6">Loading orders...</p>
           ) : (
             <div className="flex flex-col gap-3">
               {activeOrdersQuery.data && activeOrdersQuery.data.length === 0 && (
-                <p className="text-center text-sm text-black/30 font-medium uppercase py-4">Tidak ada order aktif di meja ini.</p>
+                <p className="text-center text-sm text-black/30 font-medium uppercase py-4">No active orders at this table.</p>
               )}
               {activeOrdersQuery.data?.map((order) => (
                 <div key={order.id} className="border border-black/10 p-3 flex flex-col gap-2">
@@ -657,7 +657,7 @@ export const POSBoard = () => {
                       onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
                       className="text-xs font-bold uppercase text-black/50 underline hover:text-black"
                     >
-                      {expandedOrderId === order.id ? 'Tutup Rincian' : 'Lihat Rincian'}
+                      {expandedOrderId === order.id ? 'Hide Details' : 'View Details'}
                     </button>
                     <span className="text-sm font-black text-black">{formatUsd(order.total)}</span>
                   </div>
@@ -665,7 +665,7 @@ export const POSBoard = () => {
                   {expandedOrderId === order.id && (
                     <div className="border-t border-black/5 pt-2 flex flex-col gap-1">
                       {billQuery.isLoading ? (
-                        <p className="text-xs text-black/30 uppercase">Memuat rincian...</p>
+                        <p className="text-xs text-black/30 uppercase">Loading details...</p>
                       ) : (
                         billQuery.data?.items.map((item, i) => (
                           <div key={i} className="flex justify-between text-xs text-black/60">
@@ -694,7 +694,7 @@ export const POSBoard = () => {
               {selectedOrderIds.size > 0 && (
                 <div className="border border-black bg-black/[0.02] p-3 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-xs font-bold uppercase text-black/60">
-                    <span>{selectedOrderIds.size} Order Terpilih</span>
+                    <span>{selectedOrderIds.size} Order(s) Selected</span>
                     <span className="text-black">{formatUsd(selectedOrdersTotal)}</span>
                   </div>
                   <div className="flex gap-2">
@@ -703,15 +703,15 @@ export const POSBoard = () => {
                       disabled={printOnlyMutation.isPending}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider border border-black/10 text-black/70 hover:enabled:bg-black hover:enabled:text-white transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                      <Receipt className="w-3 h-3" /> Cetak Struk
+                      <Receipt className="w-3 h-3" /> Print Receipt
                     </button>
                     <button
                       onClick={() => payAndPrintMutation.mutate([...selectedOrderIds])}
                       disabled={payAndPrintMutation.isPending || selectedHasPaid}
-                      title={selectedHasPaid ? 'Order yang sudah lunas tidak bisa dibayar ulang.' : undefined}
+                      title={selectedHasPaid ? 'An order that is already paid cannot be paid again.' : undefined}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-black/80 transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                      <CheckCircle2 className="w-3 h-3" /> Tandai Lunas & Cetak
+                      <CheckCircle2 className="w-3 h-3" /> Mark Paid & Print
                     </button>
                   </div>
                 </div>
@@ -720,7 +720,7 @@ export const POSBoard = () => {
               <button
                 onClick={() => checkoutTableId && markTableAvailableMutation.mutate(checkoutTableId)}
                 disabled={!allOrdersPaid || markTableAvailableMutation.isPending}
-                title={!allOrdersPaid ? 'Semua order harus lunas dulu sebelum meja bisa ditandai tersedia.' : undefined}
+                title={!allOrdersPaid ? 'All orders must be paid before the table can be marked available.' : undefined}
                 className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-bold uppercase tracking-wider border transition-colors cursor-pointer disabled:cursor-not-allowed border-black/10 bg-white text-black/70 hover:enabled:bg-black hover:enabled:text-white disabled:opacity-40"
               >
                 <Unlock className="w-3 h-3" /> Mark Table Available

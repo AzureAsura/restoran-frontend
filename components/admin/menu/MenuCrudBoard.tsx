@@ -36,6 +36,7 @@ import {
   updateCategory,
   deleteCategory,
   type MenuItemFormInput,
+  type UpdateCategoryInput,
 } from '@/lib/queries/menu';
 import type { MenuCategory, MenuItem, MenuItemStatus } from '@/types/api';
 
@@ -56,6 +57,21 @@ function apiErrorMessage(error: unknown, fallback: string) {
 
 function categoryLabel(category: MenuCategory) {
   return category.is_active ? category.name : `${category.name} (INACTIVE)`;
+}
+
+function readImageFile(file: File, onLoad: (dataUrl: string) => void): boolean {
+  if (!file.type.startsWith('image/')) {
+    toast.error('File must be an image.');
+    return false;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error('Image size must not exceed 5MB.');
+    return false;
+  }
+  const reader = new FileReader();
+  reader.onloadend = () => onLoad(reader.result as string);
+  reader.readAsDataURL(file);
+  return true;
 }
 
 export default function MenuCrudBoard() {
@@ -79,6 +95,9 @@ export default function MenuCrudBoard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categoryForm, setCategoryForm] = useState(EMPTY_CATEGORY_FORM);
+  const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
+  const [categoryImagePreview, setCategoryImagePreview] = useState<string | null>(null);
+  const categoryFileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
@@ -135,8 +154,7 @@ export default function MenuCrudBoard() {
   });
 
   const updateCategoryMutation = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: { name?: string; is_active?: boolean } }) =>
-      updateCategory(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateCategoryInput }) => updateCategory(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
       queryClient.invalidateQueries({ queryKey: ['menu'] });
@@ -183,22 +201,22 @@ export default function MenuCrudBoard() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('File must be an image.');
+    if (!readImageFile(file, setImagePreview)) {
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must not exceed 5MB.');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
     setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result as string);
-    reader.readAsDataURL(file);
+  };
+
+  const handleCategoryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!readImageFile(file, setCategoryImagePreview)) {
+      if (categoryFileInputRef.current) categoryFileInputRef.current.value = '';
+      return;
+    }
+    setCategoryImageFile(file);
   };
 
   const handleSaveMenu = (e: React.FormEvent) => {
@@ -265,13 +283,13 @@ export default function MenuCrudBoard() {
     if (editingCategory) {
       updateCategoryMutation.mutate({
         id: editingCategory.id,
-        input: { name: categoryForm.name, is_active: categoryForm.is_active },
+        input: { name: categoryForm.name, is_active: categoryForm.is_active, image: categoryImageFile },
       });
     } else {
       // POST /admin/menu-categories cuma terima `name` (+ sort_order yang kita
       // skip) — kategori baru selalu dibuat aktif oleh backend, gak ada field
       // is_active buat di-set saat create.
-      createCategoryMutation.mutate({ name: categoryForm.name });
+      createCategoryMutation.mutate({ name: categoryForm.name, image: categoryImageFile });
     }
   };
 
@@ -284,12 +302,18 @@ export default function MenuCrudBoard() {
   const openAddCategoryModal = () => {
     setEditingCategory(null);
     setCategoryForm(EMPTY_CATEGORY_FORM);
+    setCategoryImageFile(null);
+    setCategoryImagePreview(null);
+    if (categoryFileInputRef.current) categoryFileInputRef.current.value = '';
     setIsCategoryModalOpen(true);
   };
 
   const openEditCategoryModal = (category: MenuCategory) => {
     setEditingCategory(category);
     setCategoryForm({ name: category.name, is_active: category.is_active });
+    setCategoryImageFile(null);
+    setCategoryImagePreview(category.image_url);
+    if (categoryFileInputRef.current) categoryFileInputRef.current.value = '';
     setIsCategoryModalOpen(true);
   };
 
@@ -620,6 +644,27 @@ export default function MenuCrudBoard() {
                     </DialogTitle>
                   </DialogHeader>
 
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-black/[0.01] border border-black/5 p-4 shrink-0">
+                    <div className="w-20 h-16 bg-black/5 flex items-center justify-center overflow-hidden shrink-0 border border-black/5">
+                      {categoryImagePreview ? (
+                        <img src={categoryImagePreview} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <Upload className="w-5 h-5 text-black/20" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 w-full">
+                      <span className="text-xs font-bold text-black/40 uppercase tracking-wider leading-none">Thumbnail Image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={categoryFileInputRef}
+                        onChange={handleCategoryImageChange}
+                        className="text-xs font-medium text-black/60 file:mr-2 file:py-1 file:px-2 file:border file:border-black/10 file:bg-white file:text-[10px] file:font-bold file:uppercase file:cursor-pointer hover:file:bg-black/5 mt-1 w-full"
+                      />
+                      <span className="text-[10px] font-bold text-black/30 leading-none">MAX SIZE: 5MB</span>
+                    </div>
+                  </div>
+
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-black/50 uppercase tracking-wide leading-none">Category Name</label>
                     <input
@@ -682,11 +727,20 @@ export default function MenuCrudBoard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[2vw] md:gap-[0.6vw]">
             {categories.map((cat) => (
               <div key={cat.id} className="border border-black/5 bg-[#FBFBFB] p-[3vw] md:p-[1vw] flex flex-col justify-between h-[28vw] md:h-[7.5vw] rounded-none">
-                <div className="flex justify-between items-start w-full">
-                  <span className="text-[3.4vw] md:text-[0.9vw] font-bold text-black uppercase tracking-tight truncate max-w-[70%]">
-                    {cat.name}
-                  </span>
-                  <span className={`px-1 py-0.5 text-[8px] font-black uppercase tracking-wider border rounded-none ${cat.is_active ? 'border-green-100 bg-green-50 text-green-600' : 'border-black/10 bg-black/5 text-black/40'
+                <div className="flex justify-between items-start w-full gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-[8vw] h-[6vw] md:w-[2.4vw] md:h-[1.8vw] bg-black/5 border border-black/5 flex items-center justify-center overflow-hidden shrink-0">
+                      {cat.image_url ? (
+                        <img src={cat.image_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <Slash className="w-3.5 h-3.5 text-black/20" />
+                      )}
+                    </div>
+                    <span className="text-[3.4vw] md:text-[0.9vw] font-bold text-black uppercase tracking-tight truncate">
+                      {cat.name}
+                    </span>
+                  </div>
+                  <span className={`px-1 py-0.5 text-[8px] font-black uppercase tracking-wider border rounded-none shrink-0 ${cat.is_active ? 'border-green-100 bg-green-50 text-green-600' : 'border-black/10 bg-black/5 text-black/40'
                     }`}>
                     {cat.is_active ? 'Active' : 'Inactive'}
                   </span>

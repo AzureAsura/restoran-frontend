@@ -65,24 +65,36 @@ export function deleteMenuItem(id: string) {
 
 export interface CreateCategoryInput {
   name: string;
+  image?: File | null;
 }
 
 export interface UpdateCategoryInput {
   name?: string;
   is_active?: boolean;
+  image?: File | null;
+}
+
+function toCategoryFormData(input: CreateCategoryInput | UpdateCategoryInput) {
+  const formData = new FormData();
+  if (input.name !== undefined) formData.set("name", input.name);
+  if ("is_active" in input && input.is_active !== undefined) {
+    formData.set("is_active", String(input.is_active));
+  }
+  if (input.image) formData.set("image", input.image);
+  return formData;
 }
 
 export function createCategory(input: CreateCategoryInput) {
   return apiFetch<MenuCategory>("/admin/menu-categories", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: toCategoryFormData(input),
   });
 }
 
 export function updateCategory(id: string, input: UpdateCategoryInput) {
   return apiFetch<MenuCategory>(`/admin/menu-categories/${id}`, {
     method: "PATCH",
-    body: JSON.stringify(input),
+    body: toCategoryFormData(input),
   });
 }
 

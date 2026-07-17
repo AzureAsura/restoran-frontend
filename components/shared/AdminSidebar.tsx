@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -69,7 +70,7 @@ export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggl
 
           <nav className="flex flex-col gap-[0.4vw]">
             {filteredLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 title={isCollapsed ? link.name : undefined}
@@ -83,7 +84,7 @@ export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggl
               >
                 <link.icon className="w-[1.1vw] h-[1.1vw] stroke-[2] shrink-0" />
                 {!isCollapsed && link.name}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -122,7 +123,7 @@ export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggl
 
             <nav className="flex flex-col gap-[2vw]">
               {filteredLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   onClick={onMobileClose}
@@ -132,7 +133,7 @@ export const AdminSidebar = ({ isMobileOpen, onMobileClose, isCollapsed, onToggl
                 >
                   <link.icon className="w-[5vw] h-[5vw]" />
                   {link.name}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>

@@ -114,7 +114,7 @@ export const KitchenBoard = () => {
     },
     onError: (error, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(['kitchen-queue'], context.previous);
-      toast.error(apiErrorMessage(error, 'Gagal memperbarui status, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to update status, please try again.'));
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['kitchen-queue'] });
@@ -132,7 +132,7 @@ export const KitchenBoard = () => {
         <div className="flex items-center gap-3">
           <div>
             <h1 className="text-sm font-black uppercase tracking-widest leading-none">KITCHEN DISPLAY SYSTEM</h1>
-            <p className="text-[10px] text-black/40 font-bold uppercase mt-1">MONITOR ANTREAN DAPUR • FIFO</p>
+            <p className="text-[10px] text-black/40 font-bold uppercase mt-1">KITCHEN QUEUE MONITOR • FIFO</p>
           </div>
         </div>
 
@@ -160,8 +160,8 @@ export const KitchenBoard = () => {
         {tickets.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-center border border-dashed border-black/10 bg-white rounded-none p-8">
             <ChefHat className="w-12 h-12 text-black/10 mb-2 stroke-[1]" />
-            <h3 className="text-sm font-black uppercase tracking-wider text-black/40">DAPUR BERSIH!</h3>
-            <p className="text-[10px] text-black/30 font-bold uppercase max-w-xs mt-1">Tidak ada order pending/cooking saat ini.</p>
+            <h3 className="text-sm font-black uppercase tracking-wider text-black/40">KITCHEN CLEAR!</h3>
+            <p className="text-[10px] text-black/30 font-bold uppercase max-w-xs mt-1">No pending/cooking orders right now.</p>
           </div>
         ) : (
           tickets.map((ticket) => (

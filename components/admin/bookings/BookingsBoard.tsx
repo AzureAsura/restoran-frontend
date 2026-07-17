@@ -84,7 +84,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal mengubah status booking, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to update booking status, please try again.'));
     },
   });
 
@@ -182,7 +182,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
             <Search className="w-4 h-4 text-black/30 absolute left-0" />
             <input
               type="text"
-              placeholder="CARI NAMA / HP..."
+              placeholder="SEARCH NAME / PHONE..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full bg-transparent border-b border-black/10 focus:border-black pl-6 pb-2 text-sm font-medium uppercase tracking-wide placeholder:text-black/20 focus:outline-none transition-colors"
@@ -227,7 +227,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
           <div className="flex flex-col gap-2 md:hidden">
             {bookings.length === 0 && (
               <div className="bg-white border border-black/5 p-6 text-center text-sm text-black/30 font-medium uppercase tracking-wider">
-                Tidak ada data
+                No data
               </div>
             )}
             {bookings.map((b) => (
@@ -292,7 +292,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
             <table className="w-full min-w-[800px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-black/10 bg-black/[0.01]">
-                  {['Waktu', 'Nama', 'HP', 'Jumlah', 'Meja', 'Area', 'Status', 'Aksi'].map((th) => (
+                  {['Time', 'Name', 'Phone', 'Party', 'Table', 'Area', 'Status', 'Action'].map((th) => (
                     <th key={th} className="px-[1.5vw] py-[1vw] text-[0.8vw] font-bold uppercase tracking-wider text-black/50">
                       {th}
                     </th>
@@ -303,7 +303,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
                 {bookings.length === 0 && (
                   <tr>
                     <td colSpan={8} className="px-[1.5vw] py-[2vw] text-center text-[0.9vw] text-black/30 font-medium uppercase tracking-wider">
-                      Tidak ada data
+                      No data
                     </td>
                   </tr>
                 )}
@@ -506,7 +506,7 @@ export const BookingsBoard = ({ initialDate }: BookingsBoardProps) => {
               {noteBooking?.booking_time} · {noteBooking?.table?.name ?? '—'}
             </span>
             <DialogTitle className="text-lg md:text-[1.2vw] font-bold text-black uppercase mt-1 leading-none">
-              Catatan — {noteBooking?.customer_name}
+              Notes — {noteBooking?.customer_name}
             </DialogTitle>
           </DialogHeader>
 

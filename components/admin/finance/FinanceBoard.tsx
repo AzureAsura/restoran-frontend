@@ -99,7 +99,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
       setReceiptOpen(true);
     },
     onError: () => {
-      toast.error('Gagal memuat struk, coba lagi.');
+      toast.error('Failed to load receipt, please try again.');
     },
   });
 
@@ -162,7 +162,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
               }`}
             >
               {growthPercent === null ? (
-                'N/A vs Periode Sebelumnya'
+                'N/A vs Previous Period'
               ) : (
                 <>
                   {growthPercent >= 0 ? (
@@ -170,7 +170,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                   ) : (
                     <TrendingDown className="w-[2vw] md:w-[0.65vw] h-[2vw] md:h-[0.65vw]" />
                   )}
-                  {Math.abs(growthPercent)}% vs Periode Sebelumnya
+                  {Math.abs(growthPercent)}% vs Previous Period
                 </>
               )}
             </span>
@@ -178,7 +178,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
 
           <div className="border border-black/5 bg-white p-[4vw] md:p-[1.2vw] flex flex-col justify-between h-[26vw] md:h-[8.2vw] rounded-none">
             <span className="text-[2.2vw] md:text-[0.65vw] font-bold text-black/30 uppercase tracking-wider flex items-center gap-[0.4vw] leading-none">
-              <ReceiptIcon className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Jumlah Transaksi
+              <ReceiptIcon className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Transaction Count
             </span>
             <span className="text-[6.2vw] md:text-[1.85vw] font-black text-black leading-none tracking-tight">
               {revenue.summary.order_count} TXS
@@ -187,7 +187,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
 
           <div className="border border-black/5 bg-white p-[4vw] md:p-[1.2vw] flex flex-col justify-between h-[26vw] md:h-[8.2vw] rounded-none">
             <span className="text-[2.2vw] md:text-[0.65vw] font-bold text-black/30 uppercase tracking-wider flex items-center gap-[0.4vw] leading-none">
-              <TrendingUp className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Rata-Rata Per Transaksi
+              <TrendingUp className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Average Per Transaction
             </span>
             <span className="text-[6.2vw] md:text-[1.85vw] font-black text-black leading-none tracking-tight">
               {revenue.summary.avg_order_value_formatted}
@@ -304,7 +304,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
             Receipt Transaction History
           </h3>
           <span className="text-[2vw] md:text-[0.6vw] font-bold text-black/30 uppercase tracking-wider mt-1">
-            List order lunas dalam periode terpilih
+            Paid orders in the selected period
           </span>
         </div>
 
@@ -315,7 +315,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
                 <tr className="border-b border-black/10 bg-black/[0.01]">
-                  {['Waktu Bayar', 'Meja / Area', 'Status', 'Total Gross', 'Actions'].map((th) => (
+                  {['Paid At', 'Table / Area', 'Status', 'Gross Total', 'Actions'].map((th) => (
                     <th key={th} className="px-[1.5vw] py-[1vw] text-[2.4vw] md:text-[0.75vw] font-black uppercase tracking-wider text-black/40">
                       {th}
                     </th>
@@ -345,7 +345,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                       </td>
                       <td className="px-[1.5vw] py-[1vw]">
                         <span className="px-2 py-0.5 text-[8px] font-black uppercase border border-green-200 bg-green-50 text-green-600 rounded-none">
-                          Lunas
+                          Paid
                         </span>
                       </td>
                       <td className="px-[1.5vw] py-[1vw] text-[3vw] md:text-[0.85vw] font-black text-[#6E3A2F]">{formatUsd(groupTotal)}</td>
@@ -355,7 +355,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                             onClick={() => reprintMutation.mutate(groupIds)}
                             disabled={reprintMutation.isPending}
                             className="p-1 border border-black/5 hover:border-black/30 bg-white text-black transition-all cursor-pointer disabled:opacity-40"
-                            title="Lihat / Cetak Struk"
+                            title="View / Print Receipt"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
@@ -363,7 +363,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                             onClick={() => reprintMutation.mutate(groupIds)}
                             disabled={reprintMutation.isPending}
                             className="p-1 border border-black/5 hover:border-black/30 bg-white text-black transition-all cursor-pointer disabled:opacity-40"
-                            title="Cetak Struk"
+                            title="Print Receipt"
                           >
                             <Printer className="w-3.5 h-3.5" />
                           </button>
@@ -379,7 +379,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
 
         <div className="w-full flex justify-between items-center border-t border-black/5 pt-4 mt-2">
           <span className="text-[2.4vw] md:text-[0.75vw] font-bold text-black/30 uppercase tracking-wider">
-            Halaman {paidOrdersResult.pagination.page} dari {paidOrdersResult.pagination.total_pages} · {paidOrdersResult.pagination.total} Order Lunas
+            Page {paidOrdersResult.pagination.page} of {paidOrdersResult.pagination.total_pages} · {paidOrdersResult.pagination.total} Paid Orders
           </span>
 
           <div className="flex items-center border border-black/10 bg-black/[0.01] p-0.5">
@@ -489,7 +489,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                 menuSort === 'best' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
               }`}
             >
-              Terlaris
+              Best Sellers
             </button>
             <button
               onClick={() => setMenuSort('worst')}
@@ -497,7 +497,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
                 menuSort === 'worst' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
               }`}
             >
-              Jarang Dipesan
+              Rarely Ordered
             </button>
           </div>
         </div>
@@ -529,7 +529,7 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
 
         <div className="flex flex-col gap-2 pt-[2vw] md:pt-[1vw] border-t border-black/5">
           <span className="text-[2.2vw] md:text-[0.65vw] font-bold text-black/30 uppercase tracking-wider flex items-center gap-[0.4vw]">
-            <Link2 className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Cross-Sell — Top 10 Pasangan Item
+            <Link2 className="w-[2.5vw] md:w-[0.7vw] h-[2.5vw] md:h-[0.7vw]" /> Cross-Sell — Top 10 Item Pairs
           </span>
 
           {menuFinancials.cross_sell.length === 0 ? (
@@ -539,8 +539,8 @@ export default function FinanceBoard({ initialPeriod, initialDate }: FinanceBoar
               <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead>
                   <tr className="border-b border-black/10 bg-black/[0.01]">
-                    <th className="px-[1.5vw] py-[1vw] text-[2.4vw] md:text-[0.75vw] font-black uppercase tracking-wider text-black/40">Pasangan Item</th>
-                    <th className="px-[1.5vw] py-[1vw] text-[2.4vw] md:text-[0.75vw] font-black uppercase tracking-wider text-black/40 text-right">Frekuensi</th>
+                    <th className="px-[1.5vw] py-[1vw] text-[2.4vw] md:text-[0.75vw] font-black uppercase tracking-wider text-black/40">Item Pair</th>
+                    <th className="px-[1.5vw] py-[1vw] text-[2.4vw] md:text-[0.75vw] font-black uppercase tracking-wider text-black/40 text-right">Frequency</th>
                   </tr>
                 </thead>
                 <tbody>

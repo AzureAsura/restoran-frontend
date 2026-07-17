@@ -6,6 +6,7 @@ export interface MenuCategory {
   id: string;
   restaurant_id: string;
   name: string;
+  image_url: string | null;
   sort_order: number;
   is_active: boolean;
 }

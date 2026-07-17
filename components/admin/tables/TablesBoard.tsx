@@ -101,12 +101,12 @@ export const TablesBoard = () => {
     mutationFn: createTable,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
-      toast.success('Meja baru berhasil ditambahkan.');
+      toast.success('New table added successfully.');
       setIsCreateOpen(false);
       setCreateForm(EMPTY_CREATE_FORM);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal menambahkan meja, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to add table, please try again.'));
     },
   });
 
@@ -114,11 +114,11 @@ export const TablesBoard = () => {
     mutationFn: ({ id, input }: { id: string; input: EditFormState }) => updateTable(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
-      toast.success('Meja berhasil diperbarui.');
+      toast.success('Table updated successfully.');
       setIsEditOpen(false);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal memperbarui meja, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to update table, please try again.'));
     },
   });
 
@@ -126,11 +126,11 @@ export const TablesBoard = () => {
     mutationFn: deleteTable,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
-      toast.success('Meja berhasil dihapus.');
+      toast.success('Table deleted successfully.');
       setIsDetailOpen(false);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, 'Gagal menghapus meja, coba lagi.'));
+      toast.error(apiErrorMessage(error, 'Failed to delete table, please try again.'));
     },
   });
 
@@ -147,7 +147,7 @@ export const TablesBoard = () => {
 
   const handleDelete = () => {
     if (!activeTable) return;
-    if (!window.confirm(`Hapus meja "${activeTable.name}"?`)) return;
+    if (!window.confirm(`Delete table "${activeTable.name}"?`)) return;
     deleteMutation.mutate(activeTable.id);
   };
 
