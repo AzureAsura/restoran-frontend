@@ -12,11 +12,10 @@ import Navbar from '@/components/shared/Navbar';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import { getQueryClient } from '@/lib/query-client';
 import { menuQueryOptions } from '@/lib/queries/menu';
+import ChatWidget from '@/components/shared/ChatWidget';
 
 const page = () => {
   const queryClient = getQueryClient();
-  // Query key sama dengan halaman /menu ('menu'), jadi kalau user lanjut
-  // ke /menu dari sini, datanya sudah ada di cache — tidak fetch dua kali.
   void queryClient.prefetchQuery(menuQueryOptions());
 
   return (
@@ -32,6 +31,7 @@ const page = () => {
       <Testimonials/>
       <RestaurantEvents/>
       <InfoCards/>
+      <ChatWidget/>
       <Footer/>
     </div>
   )

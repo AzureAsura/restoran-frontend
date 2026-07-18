@@ -81,6 +81,10 @@ Cart POS, filter/search input, view toggle, dialog open/close — semua tetap `u
 5. Item kitchen yang di-mark `ready` **hilang dari `GET /admin/kitchen-queue`** by design (PRD) — makanya UI kitchen cuma 2 tahap (Pending→Cooking→langsung Served, skip `ready`).
 6. Kitchen status di-track **per item**, bukan per order — 1 order bisa punya item di tahap beda-beda.
 
+## Known gaps FE (dicatat, belum diperbaiki)
+
+1. **`BookingForm.tsx` `TIME_SLOTS` statis** (`'17:00'`...`'22:30'`, sama persis tiap hari) — gak menyesuaikan jam operasional per hari. Sejak DB di-rename ke Megatha, jam buka beda per hari (`restaurant.openingHours`: Senin-Kamis `17:00-23:00`, Jumat-Minggu `16:00-23:59`), tapi form booking cuma nawarin satu daftar jam yang sama buat semua hari. Akibatnya customer gak bisa pilih jam 16:00/16:30 atau 23:00/23:30 di akhir pekan padahal resto buka — perlu digenerate per hari (atau minimal 2 varian: weekday/weekend), bukan array hardcode.
+
 ## Pattern & file reusable
 
 - `lib/admin-routes.ts` — `ADMIN_ROUTE_ROLES` + `getAdminRouteRoles()`, dipakai `proxy.ts` & `AdminSidebar.tsx`.

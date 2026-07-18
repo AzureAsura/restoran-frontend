@@ -28,7 +28,7 @@ const InfoCards = () => {
             </div>
             <div className="flex flex-col gap-[0.5vw] mt-[2vw] md:mt-0">
               <span className="text-[2.8vw] md:text-[0.7vw] font-bold text-black/40 uppercase tracking-widest">Fri — Sun</span>
-              <span className="text-[3.8vw] md:text-[1vw] font-semibold text-black">16:00 — 00:00</span>
+              <span className="text-[3.8vw] md:text-[1vw] font-semibold text-black">16:00 — 23:59</span>
             </div>
           </div>
         </div>

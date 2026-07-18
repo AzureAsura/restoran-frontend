@@ -73,7 +73,7 @@ export const Footer = () => {
               Fri — Sun
             </span>
             <p className="text-[3.8vw] md:text-[1vw] font-semibold text-black uppercase">
-              16:00 — 00:00
+              16:00 — 23:59
             </p>
           </div>
         </div>

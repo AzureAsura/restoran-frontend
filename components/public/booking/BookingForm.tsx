@@ -139,7 +139,7 @@ export const BookingForm = () => {
                 type="text"
                 placeholder="YOUR NAME"
                 {...register('customer_name')}
-                className={`w-full bg-transparent border-b ${errors.customer_name ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none uppercase tracking-wide transition-colors`}
+                className={`w-full bg-transparent border-b ${errors.customer_name ? 'border-red-500' : 'border-black/20 focus:border-black'} pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none tracking-wide transition-colors`}
               />
               {errors.customer_name && (
                 <span className="text-red-500 text-[2.8vw] md:text-[0.8vw] font-medium uppercase tracking-wide mt-[0.2vw]">
@@ -267,7 +267,7 @@ export const BookingForm = () => {
                 rows={3}
                 placeholder="FOOD ALLERGIES, BIRTHDAY CELEBRATIONS, OR OTHER SPECIAL REQUESTS..."
                 {...register('special_requests')}
-                className="w-full bg-transparent border-b border-black/20 focus:border-black pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none uppercase tracking-wide resize-none transition-colors"
+                className="w-full bg-transparent border-b border-black/20 focus:border-black pb-[0.8vw] text-[4vw] md:text-[1.1vw] font-medium text-black placeholder:text-black/20 focus:outline-none tracking-wide resize-none transition-colors"
               />
             </div>
 

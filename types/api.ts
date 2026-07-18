@@ -344,6 +344,33 @@ export interface MenuFinancials extends AnalyticsPeriodRange {
   cross_sell: MenuFinancialCrossSellPair[];
 }
 
+// ── AI Concierge (public chat widget) ──
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatRequest {
+  message: string;
+  customer_phone?: string;
+  session_id?: string;
+  history?: ChatMessage[];
+}
+
+export type ChatAction = "none" | "show_availability" | "confirm_booking";
+
+export interface ChatResponse {
+  response: string;
+  action: ChatAction;
+  suggested_tables: {
+    id: string;
+    name: string;
+    area: Area;
+    capacity: number;
+  }[];
+}
+
 export type StaffRole = "owner" | "cashier" | "kitchen";
 
 export interface Session {
