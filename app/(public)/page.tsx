@@ -9,7 +9,6 @@ import FlowingMenuSection from '@/components/public/landing-page/FlowingMenuSect
 import FlowingMenuSkeleton from '@/components/public/landing-page/FlowingMenuSkeleton';
 import Footer from '@/components/shared/Footer';
 import Navbar from '@/components/shared/Navbar';
-import ScrollReveal from '@/components/ui/ScrollReveal';
 import { getQueryClient } from '@/lib/query-client';
 import { menuQueryOptions } from '@/lib/queries/menu';
 import ChatWidget from '@/components/shared/ChatWidget';
@@ -20,7 +19,7 @@ const page = () => {
 
   return (
     <div className='w-full min-h-screen bg-canvas flex flex-col items-center'>
-      <Navbar/>
+      {/* <Navbar/> */}
       <Hero />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<FlowingMenuSkeleton />}>
@@ -31,8 +30,8 @@ const page = () => {
       <Testimonials/>
       <RestaurantEvents/>
       <InfoCards/>
-      <ChatWidget/>
-      <Footer/>
+      {/* <ChatWidget/> */}
+      {/* <Footer/> */}
     </div>
   )
 }
